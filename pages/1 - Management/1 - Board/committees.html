@@ -7,47 +7,53 @@ nav_order: 3
 <section class="container">
   <h2>Silver Creek Townhomes Association — Committees</h2>
 
-  {% assign txt_page = site.pages | where_exp: "p", "p.name == 'Committees.txt'" | first %}
+  {% assign txt_page = site.pages | where: "name", "Committees.txt" | first %}
 
   {% if txt_page %}
-    {% assign raw_content = txt_page.content | strip %}
-    {% assign blocks = raw_content | split: "
+    {% capture newline %}
+{% endcapture %}
+    {% assign lines = txt_page.content | split: newline %}
+    {% assign in_list = false %}
+    {% assign expect_heading = true %}
+    {% assign first_section = true %}
 
-" %}
+    {% for line in lines %}
+      {% assign clean = line | strip %}
 
-    {% capture formatted_md %}
-      {% for block in blocks %}
-        {% assign lines = block | strip | split: "
-" %}
-        {% assign first_line = lines[0] | strip %}
+      {% if clean == "" %}
+        {% if in_list %}</ul>{% endif %}
+        {% assign in_list = false %}
+        {% assign expect_heading = true %}
 
-        {% if first_line contains "(" and first_line contains ")" %}
-*{{ first_line }}*
+      {% elsif clean == "---" %}
+        {% comment %}ignore manual separators{% endcomment %}
 
----
+      {% elsif clean contains "(as of" %}
+        {% if in_list %}</ul>{% endif %}
+        {% assign in_list = false %}
+        {% unless first_section %}<hr>{% endunless %}
+        {% assign first_section = false %}
+        <p><em>{{ clean }}</em></p>
+        {% assign expect_heading = true %}
 
-        {% elsif lines.size > 0 %}
-### {{ first_line }}
+      {% elsif expect_heading %}
+        <h3>{{ clean }}</h3>
+        {% assign expect_heading = false %}
 
-          {% for line in lines offset:1 %}
-            {% assign clean = line | strip %}
-            {% if clean contains "Oversight/Advisor:" %}
-- **{{ clean }}**
-            {% elsif clean == "Members:" %}
-- **Members:**
-            {% elsif clean != "" %}
-  - {{ clean }}
-            {% endif %}
-          {% endfor %}
+      {% elsif clean contains "Oversight/Advisor:" %}
+        <p><strong>{{ clean }}</strong></p>
 
----
+      {% elsif clean == "Members:" %}
+        <p><strong>Members:</strong></p>
+        <ul>
+        {% assign in_list = true %}
 
-        {% endif %}
-      {% endfor %}
-    {% endcapture %}
+      {% else %}
+        <li>{{ clean }}</li>
+      {% endif %}
+    {% endfor %}
 
-    {{ formatted_md | markdownify }}
-
+    {% if in_list %}</ul>{% endif %}
   {% else %}
     <p><em>Committee details are currently unavailable.</em></p>
   {% endif %}
