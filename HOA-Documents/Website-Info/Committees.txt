@@ -1,6 +1,6 @@
 ---
 ---
-(as of February 2026)
+(as of November 2026)
 
 Architectural
 Oversight/Advisor: Matt Schwenk
@@ -10,10 +10,12 @@ Oversight/Advisor: Neal Nuttall
 Members:
 Jim Caster
 Daniel Gill
-Robert Bromley
 
 Communications
 Oversight/Advisor: Bruce Lindsay
+Members:
+Brandon Jackson
+Shari Daiuto
 
 Governance
 Oversight/Advisor: Hans Kuhni
@@ -33,17 +35,13 @@ Pools
 Oversight/Advisor: Hans Kuhni
 Members:
 Jeff Snow
-Diane Bromley
 
 Security + Clubhouse
 Oversight/Advisor: Jeff Snow
 Members:
-Tanner & McKenzie Rodgers
-Diane & Rob Bromley
-Leann & Alex Boyd
 Chiranjeevi & Charity Allada
 Brandon & Rebecca Jackson
-Cal & Barbara Loe
+Jim and Moana Caster
 
 Social
 Oversight/Advisor: Carla Peay
