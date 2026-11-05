@@ -7,32 +7,50 @@ nav_order: 1
 <section class="container">
   <h2>2026 Silver Creek Townhomes Board of Trustees</h2>
 
-  {% assign txt_page = site.pages | where_exp: "p", "p.name == 'Board-of-Trustees.txt'" | first %}
+  {% assign txt_page = site.pages | where: "name", "Board-of-Trustees.txt" | first %}
 
   {% if txt_page %}
-{% assign clean_content = txt_page.content | replace: "
-", "
-" | strip %}
-{% assign raw_blocks = clean_content | replace: "
-
-", "|||" | split: "|||" %}
-{% capture formatted_md %}
-{% for block in raw_blocks %}
-{% assign lines = block | strip | newline_to_br | split: "<br />" %}
-{% assign title_line = lines[0] | strip %}
-{% if title_line contains "Officers of the Association" or title_line contains "Trustees" %}
-
-### {{ title_line }}
-
-{% elsif lines.size > 1 %}
-- **{{ lines[0] | strip }}**  
-{% for line in lines offset:1 %}{% assign clean_line = line | strip %}{% if clean_line contains "Phone:" %}{% assign phone_num = clean_line | replace: "Phone:", "" | strip %}  Phone: <a href="tel:{{ phone_num | remove: '-' }}">{{ phone_num }}</a>  
-{% elsif clean_line != "" %}  {{ clean_line }}  
-{% endif %}{% endfor %}
-{% endif %}
-{% endfor %}
+    {% capture newline %}
 {% endcapture %}
-    {{ formatted_md | markdownify }}
+    {% assign lines = txt_page.content | split: newline %}
+    {% assign in_person = false %}
+    {% assign expect_first = true %}
+
+    {% for line in lines %}
+      {% assign clean = line | strip %}
+
+      {% if clean == "" %}
+        {% if in_person %}</p>{% endif %}
+        {% assign in_person = false %}
+        {% assign expect_first = true %}
+
+      {% elsif clean == "---" %}
+        {% comment %}ignore separators / front matter remnants{% endcomment %}
+
+      {% elsif clean contains "Officers of the Association" or clean contains "Trustees" %}
+        {% if in_person %}</p>{% endif %}
+        {% assign in_person = false %}
+        <h3>{{ clean }}</h3>
+        {% assign expect_first = true %}
+
+      {% elsif expect_first %}
+        <p><strong>{{ clean }}</strong><br>
+        {% assign in_person = true %}
+        {% assign expect_first = false %}
+
+      {% elsif clean contains "Phone:" %}
+        {% assign phone_num = clean | replace: "Phone:", "" | strip %}
+        Phone: <a href="tel:{{ phone_num | remove: '-' }}">{{ phone_num }}</a><br>
+
+      {% elsif clean contains "@" %}
+        <a href="mailto:{{ clean }}">{{ clean }}</a><br>
+
+      {% else %}
+        {{ clean }}<br>
+      {% endif %}
+    {% endfor %}
+
+    {% if in_person %}</p>{% endif %}
   {% else %}
     <p><em>Board details are currently unavailable.</em></p>
   {% endif %}
